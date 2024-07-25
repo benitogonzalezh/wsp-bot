@@ -3,9 +3,9 @@ import {
   DisconnectReason,
   useMultiFileAuthState,
 } from "@whiskeysockets/baileys";
-import { buildMessage, getNumbersFromEnv, saveQR } from "./utils.js";
+import { buildMessage, saveQR } from "./utils.js";
+import { GROUP_ID } from "./const.js";
 
-const numbersToNotify = getNumbersFromEnv();
 const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
 
 function handleCloseConnection(lastDisconnect) {
@@ -25,11 +25,9 @@ function handleCloseConnection(lastDisconnect) {
 }
 
 async function sendMessages(sock, messageToNotify) {
-  for (const number of numbersToNotify) {
-    await sock.sendMessage(number + "@s.whatsapp.net", {
-      text: messageToNotify,
-    });
-  }
+  await sock.sendMessage(GROUP_ID, {
+    text: messageToNotify,
+  });
 }
 
 async function connectToWhatsApp() {
@@ -54,6 +52,7 @@ async function connectToWhatsApp() {
     for (const message of messages) {
       // ignore messages sent by me
       if (message?.key?.fromMe) return;
+      if (message.key.remoteJid === GROUP_ID) return;
 
       const messageToNotify = buildMessage(message);
       await sendMessages(sock, messageToNotify)

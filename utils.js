@@ -1,12 +1,6 @@
 import QRCode from "qrcode";
 import fs from "fs";
 
-export const getNumbersFromEnv = () => {
-  const numbers = process.env.NUMBERS_TO_NOTIFY;
-  if (!numbers) throw new Error("Please provide NUMBERS in env");
-  return numbers.split(",").map((n) => n.trim()).map(n => n.replace('+', ''));
-}
-
 export const saveQR = async (qr) => {
   const qrImage = await QRCode.toDataURL(qr);
 
